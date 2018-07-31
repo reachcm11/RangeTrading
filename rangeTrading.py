@@ -49,25 +49,25 @@ hIdx=df.columns.get_loc('High')
 lIdx=df.columns.get_loc('Low')
 cIdx=df.columns.get_loc('Close')
 dateIdx=df.columns.get_loc('Date')
-Treche1=False 
-Treche2=False 
-Treche3=False
+Tranche1=False 
+Tranche2=False 
+Tranche3=False
 for i in range(0,len(df)-1):
     if df.iloc[i,hIdx]>lastPeakVal:
         lastPeakVal=df.iloc[i,hIdx]
         lastPeakIdx=i
-    if Treche3==False and (lastPeakVal-df.iloc[i,lIdx])/lastPeakVal>3*dropPerc:
-        Treche3=True
+    if Tranche3==False and (lastPeakVal-df.iloc[i,lIdx])/lastPeakVal>3*dropPerc:
+        Tranche3=True
         buy.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-3*dropPerc)])
         buyHistory.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-3*dropPerc)])
         continue
-    elif Treche2==False and (lastPeakVal-df.iloc[i,lIdx])/lastPeakVal>2*dropPerc:
-        Treche2=True
+    elif Tranche2==False and (lastPeakVal-df.iloc[i,lIdx])/lastPeakVal>2*dropPerc:
+        Tranche2=True
         buy.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-2*dropPerc)])
         buyHistory.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-2*dropPerc)])
         continue
-    elif Treche1==False and (lastPeakVal-df.iloc[i,lIdx])/lastPeakVal>1*dropPerc:
-        Treche1=True
+    elif Tranche1==False and (lastPeakVal-df.iloc[i,lIdx])/lastPeakVal>1*dropPerc:
+        Tranche1=True
         buy.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-1*dropPerc)])
         buyHistory.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-1*dropPerc)])
 
@@ -82,11 +82,11 @@ for i in range(0,len(df)-1):
                 sell.append([df.iloc[i,dateIdx],i,profitPerc])
                 #reset Peak
                 if len(dfBuy)==2:
-                    Treche3=False
+                    Tranche3=False
                 if len(dfBuy)==1:
-                    Treche2=False                
+                    Tranche2=False                
                 if len(dfBuy)==1:
-                    Treche1=False
+                    Tranche1=False
                     lastPeakVal=0
                 #reset buyVal buyIdx
                 buy.pop(idx)
