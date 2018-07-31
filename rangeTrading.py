@@ -20,7 +20,7 @@ df=pd.read_csv('./data/SPXL.csv',encoding='utf8')
 df.dropna(axis=0)
 
 #delet Close column and change 'Adj Close' to 'Close'
-del df['Adj Close']
+#del df['Adj Close']
 #df=df.rename(columns={'Adj Close':'Close'})
 
 #convert Date to DateTime format
@@ -83,9 +83,9 @@ for i in range(0,len(df)-1):
                 sellHistory.append([df.iloc[i,dateIdx],i,profitPerc])
                 sell.append([df.iloc[i,dateIdx],i,profitPerc])
                 #reset Peak
-                if len(dfBuy)==2:
+                if len(dfBuy)==3:
                     Tranche3=False
-                if len(dfBuy)==1:
+                if len(dfBuy)==2:
                     Tranche2=False                
                 if len(dfBuy)==1:
                     Tranche1=False
