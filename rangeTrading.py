@@ -33,6 +33,8 @@ df['Date']=pd.to_datetime(df['Date'],format='%Y-%m-%d')
 
 #drop rows with null element
 df=df.dropna(axis=0)
+#add year field
+df['Year']=df['Date'].apply(lambda x:x.year)
 
 #Baseline
 #base = peakutils.baseline(df['50d'],10)
@@ -114,4 +116,23 @@ ax.grid(True)
 dfSellHistory['year']=dfSellHistory['date'].apply(lambda x:x.year)
 print('dropPerc=%f profitPerc=%f ProfitPercPerYear=%f' %(dropPerc,profitPerc,sum(dfSellHistory['val'])/(3*dateDiff.years)))
 print('Yearly return breakdown-----------------------------')
-print(dfSellHistory[['year','val']].groupby(['year']).sum()/3)
+rangeTrade=pd.DataFrame(dfSellHistory[['year','val']].groupby(['year']).sum()/3)
+rangeTrade.rename(columns={'val':'rangeTrade Return'},inplace=True)
+
+#yearly return buy and hold
+yrOpen=pd.DataFrame(df[['Year','Close']].groupby(['Year']).first())
+yrOpen.rename(columns={'Close':'YrOpen'},inplace=True)
+yrOpen.index.names = ['year']
+yrClose=pd.DataFrame(df[['Year','Close']].groupby(['Year']).last())
+yrClose.rename(columns={'Close':'YrClose'},inplace=True)
+yrClose.index.names = ['year']
+
+buyAndHold=yrOpen.join(yrClose,on='year',how='inner')
+#df['C'] = df.apply(lambda row: row['A'] + row['B'], axis=1)
+buyAndHold['Baseline Return']=\
+buyAndHold.apply(lambda x:(x['YrClose']-x['YrOpen'])/x['YrOpen'],axis=1)
+
+buyAndHold=buyAndHold.join(rangeTrade,on='year',how='left')
+buyAndHold.loc['mean']=buyAndHold.mean()
+print(buyAndHold[['rangeTrade Return','Baseline Return']])
+
