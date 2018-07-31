@@ -43,10 +43,8 @@ buyHistory=[]
 sellHistory=[]
 lastPeakIdx=0
 lastPeakVal=0
-buyIdx=[]
-buyVal=[]
-sellIdx=[]
-sellVal=[]
+buy=[]
+sell=[]
 hIdx=df.columns.get_loc('High')
 lIdx=df.columns.get_loc('Low')
 cIdx=df.columns.get_loc('Close')
@@ -60,41 +58,38 @@ for i in range(0,len(df)-1):
         lastPeakIdx=i
     if Treche3==False and (lastPeakVal-df.iloc[i,lIdx])/lastPeakVal>3*dropPerc:
         Treche3=True
-        buyIdx.append(i)
+        buy.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-3*dropPerc)])
         buyHistory.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-3*dropPerc)])
-        buyVal.append(lastPeakVal*(1-3*dropPerc)) # buy at dropPerc
         continue
     elif Treche2==False and (lastPeakVal-df.iloc[i,lIdx])/lastPeakVal>2*dropPerc:
         Treche2=True
-        buyIdx.append(i)
+        buy.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-2*dropPerc)])
         buyHistory.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-2*dropPerc)])
-        buyVal.append(lastPeakVal*(1-2*dropPerc)) # buy at dropPerc
         continue
     elif Treche1==False and (lastPeakVal-df.iloc[i,lIdx])/lastPeakVal>1*dropPerc:
         Treche1=True
-        buyIdx.append(i)
+        buy.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-1*dropPerc)])
         buyHistory.append([df.iloc[i,dateIdx],i,lastPeakVal*(1-1*dropPerc)])
-        buyVal.append(lastPeakVal*(1-1*dropPerc)) # buy at dropPerc
+
         #make sure not sell in the same day as buy b/c we don't know which comes first
         continue
     #sell check
-    for bv in buyVal[::-1]:
-        if df.iloc[i,hIdx]>=(1+profitPerc)*bv:
-            sellHistory.append([df.iloc[i,dateIdx],i,profitPerc])
-            sellIdx.append(i)
-            sellVal.append(profitPerc)
-            #reset Peak
-            if len(buyVal)==2:
-                Treche3=False
-            if len(buyVal)==1:
-                Treche2=False                
-            if len(buyVal)==1:
-                Treche1=False
-                lastPeakVal=0
-            #reset buyVal buyIdx
-            removeIdx=buyVal.index(bv)
-            buyVal.pop(removeIdx)
-            buyIdx.pop(removeIdx)
+    dfBuy = pd.DataFrame(buy, columns=cols)
+    if len(dfBuy)>0:
+        for idx in reversed(dfBuy.index):
+            if df.iloc[i,hIdx]>=(1+profitPerc)*dfBuy.iloc[idx,2]:
+                sellHistory.append([df.iloc[i,dateIdx],i,profitPerc])
+                sell.append([df.iloc[i,dateIdx],i,profitPerc])
+                #reset Peak
+                if len(dfBuy)==2:
+                    Treche3=False
+                if len(dfBuy)==1:
+                    Treche2=False                
+                if len(dfBuy)==1:
+                    Treche1=False
+                    lastPeakVal=0
+                #reset buyVal buyIdx
+                buy.pop(idx)
 #Profit calculation
 beginDate=df.iloc[0,dateIdx]
 endDate=df.iloc[-1,dateIdx]           
