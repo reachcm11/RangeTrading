@@ -12,7 +12,7 @@ from dateutil import relativedelta
 
 numTranches=3
 dropPerc=0.15
-profitPerc=0.1
+profitPerc=2
 
 df=pd.read_csv('./data/SPXL.csv',encoding='utf8')
 
@@ -133,6 +133,6 @@ buyAndHold['Baseline Return']=\
 buyAndHold.apply(lambda x:(x['YrClose']-x['YrOpen'])/x['YrOpen'],axis=1)
 
 buyAndHold=buyAndHold.join(rangeTrade,on='year',how='left')
-buyAndHold.loc['mean']=buyAndHold.mean()
+buyAndHold.loc['mean']=buyAndHold.sum()/buyAndHold.count().max()
 print(buyAndHold[['rangeTrade Return','Baseline Return']])
 
